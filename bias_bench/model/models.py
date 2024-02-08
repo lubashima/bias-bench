@@ -6,44 +6,57 @@ import transformers
 from bias_bench.debias.self_debias.modeling import GPT2Wrapper
 from bias_bench.debias.self_debias.modeling import MaskedLMWrapper
 
+class LlamaModel:
+    def __new__(self, model_name_or_path, auth_token):
+        return transformers.LlamaModel.from_pretrained(model_name_or_path,
+                                                             token=auth_token,
+                                                             return_dict=True,
+                                                             ).bfloat16()
+
+class LlamaCausalModel:
+    def __new__(self, model_name_or_path, auth_token):
+        return transformers.LlamaForCausalLM.from_pretrained(model_name_or_path,
+                                                             token=auth_token,
+                                                             return_dict=True,
+                                                             ).bfloat16()
 
 class BertModel:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.BertModel.from_pretrained(model_name_or_path)
 
 
 class AlbertModel:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.AlbertModel.from_pretrained(model_name_or_path)
 
 
 class RobertaModel:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.RobertaModel.from_pretrained(model_name_or_path)
 
 
 class GPT2Model:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.GPT2Model.from_pretrained(model_name_or_path)
 
 
 class BertForMaskedLM:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.BertForMaskedLM.from_pretrained(model_name_or_path)
 
 
 class AlbertForMaskedLM:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.AlbertForMaskedLM.from_pretrained(model_name_or_path)
 
 
 class RobertaForMaskedLM:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.RobertaForMaskedLM.from_pretrained(model_name_or_path)
 
 
 class GPT2LMHeadModel:
-    def __new__(self, model_name_or_path):
+    def __new__(self, model_name_or_path, *args):
         return transformers.GPT2LMHeadModel.from_pretrained(model_name_or_path)
 
 

@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+from tqdm import tqdm
 
 import numpy as np
 import torch
@@ -74,13 +75,13 @@ class SEATRunner:
         tests = self._tests or all_tests
 
         results = []
-        for test in tests:
+        for test in tqdm(tests):
             print(f"Running test {test}")
 
             # Load the test data.
             encs = _load_json(os.path.join(self._data_dir, f"{test}{self.TEST_EXT}"))
 
-            print("Computing sentence encodings")
+            # print("Computing sentence encodings")
             encs_targ1 = _encode(
                 self._model, self._tokenizer, encs["targ1"]["examples"]
             )
@@ -99,7 +100,7 @@ class SEATRunner:
             encs["attr1"]["encs"] = encs_attr1
             encs["attr2"]["encs"] = encs_attr2
 
-            print("\tDone!")
+            # print("\tDone!")
 
             # Run the test on the encodings.
             esize, pval = weat.run_test(
@@ -146,7 +147,7 @@ def _split_comma_and_check(arg_str, allowed_set, item_type):
 
 def _load_json(sent_file):
     """Load from json. We expect a certain format later, so do some post processing."""
-    print(f"Loading {sent_file}...")
+    # print(f"Loading {sent_file}...")
     all_data = json.load(open(sent_file, "r"))
     data = {}
     for k, v in all_data.items():
@@ -169,7 +170,7 @@ def _encode(model, tokenizer, texts):
         enc = enc.mean(dim=1)
 
         # Following May et al., normalize the representation.
-        encs[text] = enc.detach().view(-1).numpy()
+        encs[text] = enc.detach().float().view(-1).numpy()
         encs[text] /= np.linalg.norm(encs[text])
 
     return encs

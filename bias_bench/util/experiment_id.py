@@ -11,7 +11,7 @@ def generate_experiment_id(
     if isinstance(model, str):
         experiment_id += f"_m-{model}"
     if isinstance(model_name_or_path, str):
-        experiment_id += f"_c-{model_name_or_path}"
+        experiment_id += f"_c-{model_name_or_path.replace('/', '')}"
     if isinstance(bias_type, str):
         experiment_id += f"_t-{bias_type}"
     if isinstance(seed, int):

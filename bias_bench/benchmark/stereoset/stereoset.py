@@ -191,17 +191,23 @@ class StereoSetRunner:
         stereoset = dataloader.StereoSet(self._input_file)
 
         # Assume we are using GPT-2.
-        unconditional_start_token = "<|endoftext|>"
+        if 'llama' in self._model_name_or_path:
+            unconditional_start_token = self._tokenizer.bos_token
+        else:
+            unconditional_start_token = "<|endoftext|>"
+
         start_token = (
             torch.tensor(self._tokenizer.encode(unconditional_start_token))
             .to(device)
             .unsqueeze(0)
         )
+        print(start_token)
 
         # Get the unconditional initial token prompts if not using self-debiasing.
         if not self._is_self_debias:
             with torch.no_grad():
                 initial_token_probabilities = model(start_token)
+                # print(initial_token_probabilities[0].size())
 
             # initial_token_probabilities.shape == (1, 1, vocab_size).
             initial_token_probabilities = torch.softmax(
@@ -209,8 +215,14 @@ class StereoSetRunner:
             )
 
             # Ensure that our batch size is 1 and that our inital token isn't split into subwords.
+            if 'llama' in self._model_name_or_path:
+                # print(initial_token_probabilities.size())
+                # print(initial_token_probabilities)
+                initial_token_probabilities = initial_token_probabilities[:, 0, :][None,...]
+                
             assert initial_token_probabilities.shape[0] == 1
-            assert initial_token_probabilities.shape[1] == 1
+            assert initial_token_probabilities.shape[1] == 1, f"Shape is {initial_token_probabilities.shape}"
+            # print(initial_token_probabilities.shape)
 
         clusters = stereoset.get_intrasentence_examples()
         predictions = []
@@ -221,6 +233,7 @@ class StereoSetRunner:
 
                 # Encode the sentence
                 tokens = self._tokenizer.encode(sentence.sentence)
+                print(tokens)
                 tokens_tensor = torch.tensor(tokens).to(device).unsqueeze(0)
 
                 if self._is_self_debias:

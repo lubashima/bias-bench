@@ -27,6 +27,8 @@ parser.add_argument(
         "AlbertForMaskedLM",
         "RobertaForMaskedLM",
         "GPT2LMHeadModel",
+        'LlamaModel',
+        'LlamaCausalModel',
     ],
     help="Model to evalute (e.g., BertForMaskedLM). Typically, these correspond to a HuggingFace "
     "class.",
@@ -36,7 +38,7 @@ parser.add_argument(
     action="store",
     type=str,
     default="bert-base-uncased",
-    choices=["bert-base-uncased", "albert-base-v2", "roberta-base", "gpt2"],
+    choices=["bert-base-uncased", "albert-base-v2", "roberta-base", "gpt2", 'meta-llama/Llama-2-7b-hf'],
     help="HuggingFace model name or path (e.g., bert-base-uncased). Checkpoint from which a "
     "model is instantiated.",
 )
@@ -53,6 +55,14 @@ parser.add_argument(
     type=int,
     default=None,
     help="RNG seed. Used for logging in experiment ID.",
+)
+
+parser.add_argument(
+    "--hf_auth_token",
+    action="store",
+    type=str,
+    default=None,
+    help="Hugginface authorization token necessary to run Llama models.",
 )
 
 
@@ -73,9 +83,10 @@ if __name__ == "__main__":
     print(f" - batch_size: {args.batch_size}")
     print(f" - seed: {args.seed}")
 
-    model = getattr(models, args.model)(args.model_name_or_path)
+    model = getattr(models, args.model)(args.model_name_or_path, args.hf_auth_token)
     model.eval()
-    tokenizer = transformers.AutoTokenizer.from_pretrained(args.model_name_or_path)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(args.model_name_or_path, token=args.hf_auth_token)
+    tokenizer.pad_token = tokenizer.unk_token
 
     runner = StereoSetRunner(
         intrasentence_model=model,

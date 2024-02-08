@@ -27,7 +27,7 @@ class SEATRunner:
         data_dir,
         experiment_id,
         n_samples=100000,
-        parametric=False,
+        parametric=True,
         seed=0,
     ):
         """Initializes a SEAT test runner.

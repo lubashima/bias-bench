@@ -45,7 +45,7 @@ parser.add_argument(
 
 
 class ScoreEvaluator:
-    def __init__(self, gold_file_path, predictions_file_path):
+    def __init__(self, gold_file_path, predictions_file_path_or_dict):
         """Evaluates the results of a StereoSet predictions file with respect to the gold label file.
 
         Args:
@@ -66,8 +66,11 @@ class ScoreEvaluator:
             "intrasentence": defaultdict(lambda: []),
         }
 
-        with open(predictions_file_path) as f:
-            self.predictions = json.load(f)
+        if type(predictions_file_path_or_dict) is dict:
+            self.predictions = predictions_file_path_or_dict
+        else:
+            with open(predictions_file_path_or_dict) as f:
+                self.predictions = json.load(f)
 
         for example in self.intrasentence_examples:
             for sentence in example.sentences:
@@ -91,7 +94,7 @@ class ScoreEvaluator:
         self.results = results
 
     def get_overall_results(self):
-        return self.results
+        return dict(self.results)
 
     def evaluate(self, examples):
         counts = self.count(examples)

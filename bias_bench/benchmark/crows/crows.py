@@ -62,9 +62,9 @@ class CrowSPairsRunner:
         # CrowS-Pairs labels race examples with "race-color".
         self._bias_type = bias_type if bias_type != "race" else "race-color"
 
-    def __call__(self):
+    def __call__(self, broken_down=True):
         if self._is_generative:
-            results = self._likelihood_score_generative()
+            results = self._likelihood_score_generative(broken_down)
         else:
             results = self._likelihood_score()
         return results
@@ -186,8 +186,8 @@ class CrowSPairsRunner:
         print()
 
         return round((stereo_score + antistereo_score) / N * 100, 2)
-
-    def _likelihood_score_generative(self):
+    
+    def _get_generative_likelihood_score(self):
         df_data = self._read_data(self._input_file)
 
         # Use GPU, if available.
@@ -272,20 +272,39 @@ class CrowSPairsRunner:
                     ignore_index=True,
                 )
 
+        result_dict = {
+            'total_examples' : N,
+            'metric_score' : round((stereo_score + antistereo_score) / N * 100, 2),
+            'ss_score' : round(stereo_score / total_stereo * 100, 2),
+            'anti_ss_score' : round(antistereo_score / total_antistereo * 100, 2),
+            'num_neutral' : round(neutral / N * 100, 2),
+        }
         print("=" * 100)
-        print("Total examples:", N)
-        print("Metric score:", round((stereo_score + antistereo_score) / N * 100, 2))
-        print("Stereotype score:", round(stereo_score / total_stereo * 100, 2))
+        print("Total examples:", result_dict["total_examples"])
+        print("Metric score:", result_dict["metric_score"])
+        print("Stereotype score:", result_dict["ss_score"])
         if antistereo_score != 0:
             print(
                 "Anti-stereotype score:",
-                round(antistereo_score / total_antistereo * 100, 2),
+                result_dict["anti_ss_score"],
             )
-        print("Num. neutral:", round(neutral / N * 100, 2))
+        print("Num. neutral:", result_dict["num_neutral"])
         print("=" * 100)
         print()
 
-        return round((stereo_score + antistereo_score) / N * 100, 2)
+        return result_dict
+
+    def _likelihood_score_generative(self, broken_down):
+        if broken_down:
+            assert self._bias_type == None, "Broken down bias calculation analyses all available bias types, so bias_type cannot be fixed and has to be set to None"
+            crows_results = {}
+            for bias_type in DEBIASING_PREFIXES.keys():
+                self._bias_type = bias_type
+                crows_results[self._bias_type] = self._get_generative_likelihood_score()
+        else:
+            crows_results = self._get_generative_likelihood_score()
+        
+        return crows_results
 
     def _joint_log_probability(self, tokens):
         start_token = (

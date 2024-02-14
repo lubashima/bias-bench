@@ -8,16 +8,10 @@ from bias_bench.debias.self_debias.modeling import MaskedLMWrapper
 
 class LlamaModel:
     def __new__(self, model_name_or_path, auth_token):
-        return transformers.LlamaModel.from_pretrained(model_name_or_path,
-                                                             token=auth_token,
-                                                             return_dict=True,
-                                                             ).bfloat16()
-
-class LlamaCausalModel:
-    def __new__(self, model_name_or_path, auth_token):
         return transformers.LlamaForCausalLM.from_pretrained(model_name_or_path,
                                                              token=auth_token,
                                                              return_dict=True,
+                                                             output_hidden_states=True,
                                                              ).bfloat16()
 
 class BertModel:

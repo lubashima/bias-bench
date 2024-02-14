@@ -98,8 +98,8 @@ if __name__ == "__main__":
     )
     results = runner()
 
-    os.makedirs(f"{args.persistent_dir}/results/stereoset", exist_ok=True)
+    os.makedirs(f"{args.persistent_dir}/../../../results/profiling/stereoset", exist_ok=True)
     with open(
-        f"{args.persistent_dir}/results/stereoset/{experiment_id}.json", "w"
+        f"{args.persistent_dir}/../../../results/profiling/stereoset/{experiment_id}.json", "w"
     ) as f:
         json.dump(results, f, indent=2)

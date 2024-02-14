@@ -201,7 +201,6 @@ class StereoSetRunner:
             .to(device)
             .unsqueeze(0)
         )
-        print(start_token)
 
         # Get the unconditional initial token prompts if not using self-debiasing.
         if not self._is_self_debias:
@@ -233,7 +232,6 @@ class StereoSetRunner:
 
                 # Encode the sentence
                 tokens = self._tokenizer.encode(sentence.sentence)
-                print(tokens)
                 tokens_tensor = torch.tensor(tokens).to(device).unsqueeze(0)
 
                 if self._is_self_debias:

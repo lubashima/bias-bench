@@ -81,7 +81,7 @@ if __name__ == "__main__":
     print(f" - model_name_or_path: {args.model_name_or_path}")
 
     # Load model and tokenizer.
-    model = getattr(models, args.model)(args.model_name_or_path, args.hf_auth_token)
+    model = getattr(models, args.model)(args.model_name_or_path, args.hf_auth_token).cuda()
     model.eval()
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.model_name_or_path, token=args.hf_auth_token)
 
@@ -97,6 +97,6 @@ if __name__ == "__main__":
     results = runner()
     print(results)
 
-    os.makedirs(f"{args.persistent_dir}/results/seat", exist_ok=True)
-    with open(f"{args.persistent_dir}/results/seat/{experiment_id}.json", "w") as f:
+    os.makedirs(f"{args.persistent_dir}/../../../results/profiling/seat", exist_ok=True)
+    with open(f"{args.persistent_dir}/../../../results/profiling/seat/{experiment_id}.json", "w") as f:
         json.dump(results, f)

@@ -157,20 +157,30 @@ def _load_json(sent_file):
 
     return all_data
 
+def _to_cuda(input_dict):
+    for key in input_dict.keys():
+        input_dict[key] = input_dict[key].cuda()
+    
+    return input_dict
+
 
 def _encode(model, tokenizer, texts):
     encs = {}
     for text in texts:
         # Encode each example.
-        inputs = tokenizer(text, return_tensors="pt")
+        inputs = _to_cuda(tokenizer(text, return_tensors="pt"))
         outputs = model(**inputs)
 
         # Average over the last layer of hidden representations.
-        enc = outputs["last_hidden_state"]
+        if 'last_hidden_state' in outputs:
+            enc = outputs["last_hidden_state"]
+        else: 
+            enc = outputs['hidden_states'][-1]
+            
         enc = enc.mean(dim=1)
 
         # Following May et al., normalize the representation.
-        encs[text] = enc.detach().float().view(-1).numpy()
+        encs[text] = enc.detach().float().view(-1).cpu().numpy()
         encs[text] /= np.linalg.norm(encs[text])
 
     return encs

@@ -191,7 +191,7 @@ class StereoSetRunner:
         stereoset = dataloader.StereoSet(self._input_file)
 
         # Assume we are using GPT-2.
-        if 'llama' in self._model_name_or_path:
+        if ('llama' in self._model_name_or_path) or ('alpaca' in self._model_name_or_path):
             unconditional_start_token = self._tokenizer.bos_token
         else:
             unconditional_start_token = "<|endoftext|>"

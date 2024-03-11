@@ -8,7 +8,7 @@ def _is_generative(model):
         "DropoutGPT2LMHeadModel",
         "SelfDebiasGPT2LMHeadModel",
         "AutoModelForCausalLM",
-    ]
+    ] or 'ForCausalLM' in model
 
 
 def _is_self_debias(model):

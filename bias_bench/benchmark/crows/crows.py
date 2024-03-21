@@ -77,7 +77,7 @@ class CrowSPairsRunner:
         if self._is_self_debias:
             self._model._model.to(device)
         else:
-            self._model.to(device)
+            self._model
 
         # Score each sentence.
         # Each row in the dataframe has the sentid and score for pro and anti-stereo.
@@ -194,7 +194,7 @@ class CrowSPairsRunner:
         if self._is_self_debias:
             self._model._model.to(device)
         else:
-            self._model.to(device)
+            self._model
 
         # Score each sentence.
         # Each row in the dataframe has the sentid and score for pro and anti-stereo.

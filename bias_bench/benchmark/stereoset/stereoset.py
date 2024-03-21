@@ -183,15 +183,16 @@ class StereoSetRunner:
         """
         # Use GPU, if available.
         if self._is_self_debias:
-            self._intrasentence_model._model.to(device)
+            self._intrasentence_model._model
         else:
-            model = self._intrasentence_model.to(device)
+            model = self._intrasentence_model
 
         # Load the dataset.
         stereoset = dataloader.StereoSet(self._input_file)
 
         # Assume we are using GPT-2.
-        if ('llama' in self._model_name_or_path) or ('alpaca' in self._model_name_or_path):
+        model_path = self._model_name_or_path.lower()
+        if ('llama' in model_path) or ('alpaca' in model_path) or ('mixtral' in model_path):
             unconditional_start_token = self._tokenizer.bos_token
         else:
             unconditional_start_token = "<|endoftext|>"
@@ -214,7 +215,7 @@ class StereoSetRunner:
             )
 
             # Ensure that our batch size is 1 and that our inital token isn't split into subwords.
-            if 'llama' in self._model_name_or_path:
+            if 'llama' in model_path or 'mixtral' in model_path:
                 # print(initial_token_probabilities.size())
                 # print(initial_token_probabilities)
                 initial_token_probabilities = initial_token_probabilities[:, 0, :][None,...]
